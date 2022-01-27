@@ -40,19 +40,26 @@ class AServiceTest {
     @Autowired
     AService aService;
 
-    @Autowired
-    BRepo bRepo;
-
     @Test
     void saveTest() {
-        //created as entities with id=1,2
-        bRepo.save(new B(null, null));
-        bRepo.save(new B(null, null));
+        // works fine
+        List<B> bies = List.of(new B());
 
-
-        List<B> bies = List.of(new B(), new B());
-
-        //Failed with:  Duplicate entry '1' for key 'PRIMARY'
         aService.save(new A(null, bies));
     }
+
+    @Test
+    void saveTwoBInATest() {
+        List<B> bies = List.of(
+                new B(),
+                new B()
+        );
+
+        //  SQL [INSERT INTO `b` (`a_id`, `id`) VALUES (?, ?)];
+        //  Duplicate entry '1' for key 'PRIMARY';
+        //  nested exception is java.sql.SQLIntegrityConstraintViolationException:
+        //  Duplicate entry '1' for key 'PRIMARY'
+        aService.save(new A(null, bies));
+    }
+
 }
